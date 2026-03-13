@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Customers - SafiWash CRM{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Customer Database</h2>
+        <p class="text-muted small mb-0">Manage customer profiles and loyalty status</p>
+    </div>
+    <a href="{{ url_for('add_customer') }}" class="btn btn-dark">
+        <i class="fas fa-plus me-2"></i>Register Customer
+    </a>
+</div>
+
+<!-- Search Bar -->
+<div class="mb-4">
+    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden" style="max-width: 600px;">
+        <span class="input-group-text bg-white border-end-0 ps-4">
+            <i class="fas fa-search text-muted"></i>
+        </span>
+        <input type="text" id="customerSearch" class="form-control border-start-0 ps-2"
+            placeholder="Search name, phone, or plate..." style="font-size: 15px; border-radius: 0 40px 40px 0;">
+    </div>
+</div>
+
+<!-- Customer Table -->
+<!-- [SECTION] CUSTOMER DATABASE TABLE -->
+<!-- Responsive table showing core customer profile data -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Customer</th>
+                        <th class="d-none d-lg-table-cell">Phone</th>
+                        <th>Plate</th>
+                        <th class="text-center d-none d-md-table-cell">Visits</th>
+                        <th>Loyalty</th>
+                        <th class="d-none d-lg-table-cell">Spent</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td class="ps-4">
+                            <div>
+                                <div class="fw-semibold">{{ customer['name'] }}</div>
+                                {% if customer['car_model'] %}
+                                <div class="text-muted extra-small" style="font-size: 11px;">{{
+                                    customer['car_model'] }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="d-none d-lg-table-cell"><span class="text-muted">{{ customer['phone'] }}</span></td>
+                        <td><span class="badge bg-secondary">{{ customer['plate_number'] }}</span></td>
+                        <td class="text-center d-none d-md-table-cell">{{ customer['total_visits'] }}</td>
+                        <td style="min-width: 80px;">
+                            {% if customer['loyalty_points'] >= loyalty_threshold %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-gift me-1"></i> {{ customer['loyalty_points'] }}/{{ loyalty_threshold
+                                }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">
+                                {{ customer['loyalty_points'] }}/{{ loyalty_threshold }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold d-none d-lg-table-cell">KES {{ '{:,.0f}'.format(customer['total_spent']) }}
+                        </td>
+                        <td class="text-end pe-4">
+                            <!-- [SUB-BLOCK] ACTIONS: DESKTOP VIEW -->
+                            <!-- Direct buttons for View, Edit, and Check-In -->
+                            <div class="d-none d-md-flex justify-content-end gap-2">
+                                <a href="{{ url_for('customer_detail', customer_id=customer['id']) }}"
+                                    class="btn btn-sm btn-outline-dark" title="View Profile">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('edit_customer', customer_id=customer['id']) }}"
+                                    class="btn btn-sm btn-outline-dark" title="Edit Customer">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <a href="{{ url_for('checkin') }}?customer_id={{ customer['id'] }}"
+                                    class="btn btn-sm btn-dark" title="Check-In">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
+
+                            <!-- [SUB-BLOCK] ACTIONS: MOBILE VIEW -->
+                            <!-- Space-saving 3-dots dropdown menu -->
+                            <div class="d-md-none dropdown">
+                                <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="font-size: 14px;">
+                                    <li><a class="dropdown-item py-2"
+                                            href="{{ url_for('customer_detail', customer_id=customer['id']) }}">
+                                            <i class="fas fa-eye me-2 text-muted"></i> View Profile</a></li>
+                                    <li><a class="dropdown-item py-2"
+                                            href="{{ url_for('edit_customer', customer_id=customer['id']) }}">
+                                            <i class="fas fa-pencil-alt me-2 text-muted"></i> Edit Profile</a></li>
+                                    <li><a class="dropdown-item py-2 fw-bold"
+                                            href="{{ url_for('checkin') }}?customer_id={{ customer['id'] }}">
+                                            <i class="fas fa-plus me-2 text-primary"></i> Quick Check-In</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fas fa-users-slash fa-2x mb-3 d-block opacity-25"></i>
+                            No customers found.
+                            {% if search %}
+                            <a href="{{ url_for('customers') }}" class="ms-2">Clear search</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('customerSearch');
+        const tableBody = document.querySelector('tbody');
+        const rows = tableBody.querySelectorAll('tr');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+
+            rows.forEach(row => {
+                // Check name, phone, and plate cells
+                const text = row.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

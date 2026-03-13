@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - SafiWash CRM{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Dashboard</h2>
+        <p class="text-muted mb-0 extra-small d-none d-sm-block">Overview and key metrics</p>
+    </div>
+    <a href="{{ url_for('checkin') }}" class="btn btn-dark btn-sm px-3">
+        <i class="fas fa-plus me-1"></i> Check-In
+    </a>
+</div>
+
+<!-- [REVENUE LEAKAGE ALERT] -->
+{% if stats.at_risk_count > 0 %}
+<div class="alert alert-danger border-0 shadow-sm mb-4">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5 class="alert-heading mb-1 fw-bold">Revenue Leakage Detected!</h5>
+            <p class="mb-0">
+                <strong>{{ stats.at_risk_count }}</strong> regular customers haven't visited in over 2 weeks.
+                Potential lost revenue: <span class="fw-bold text-dark">KES {{ '{:,.0f}'.format(stats.lost_revenue)
+                    }}</span>.
+            </p>
+        </div>
+        <div class="ms-auto text-end d-none d-md-block">
+            <small class="d-block text-uppercase fw-bold opacity-75">Action Required</small>
+            <span class="badge bg-white text-danger px-3 py-2 mt-1">CONTACT CUSTOMERS</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- [SECTION] KEY PERFORMANCE METRICS -->
+<!-- Grid of cards showing total metrics (Customers, Revenue, Loyalty) -->
+<div class="row mb-4">-
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-label">Total Customers</div>
+            <div class="stat-value">{{ stats.total_customers }}</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-car"></i>
+            </div>
+            <div class="stat-label">Visits Today</div>
+            <div class="stat-value">{{ stats.visits_today }}</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-label">Revenue Today</div>
+            <div class="stat-value">KES {{ '{:,.0f}'.format(stats.revenue_today) }}</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="stat-label">This Week</div>
+            <div class="stat-value">KES {{ '{:,.0f}'.format(stats.revenue_week) }}</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-label">This Month</div>
+            <div class="stat-value">KES {{ '{:,.0f}'.format(stats.revenue_month) }}</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon mx-auto">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="stat-label">Loyalty Due</div>
+            <div class="stat-value">{{ stats.loyalty_due }}</div>
+        </div>
+    </div>
+</div>
+
+{% if at_risk_customers %}
+<!-- [SECTION] AT-RISK CUSTOMERS (ACTION LIST) -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+                <h6 class="m-0 fw-bold"><i class="fas fa-phone-alt me-2"></i> Win-Back List: Customers Gone for 14+ Days
+                </h6>
+                <span class="badge bg-white text-danger fw-bold">{{ at_risk_customers|length }} CUSTOMERS</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Plate Number</th>
+                                <th>Last Visit</th>
+                                <th>Days Away</th>
+                                <th class="text-end">Contact info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in at_risk_customers %}
+                            <tr>
+                                <td class="fw-bold">{{ customer['name'] }}</td>
+                                <td><span class="badge bg-secondary px-3">{{ customer['plate_number'] }}</span></td>
+                                <td class="text-muted">{{ customer['last_visit'] }}</td>
+                                <td>
+                                    <span class="text-danger fw-bold">{{ customer['days_gone']|round|int }} days</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="tel:{{ customer['phone'] }}" class="btn btn-sm btn-dark px-3">
+                                        <i class="fas fa-phone-alt me-1"></i> {{ customer['phone'] }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- [SECTION] RECENT ACTIVITY LOG -->
+    <!-- Table showing the last 10 visits logged in the system -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 fw-bold">
+                    <i class="fas fa-history text-muted me-2"></i> Recent Activity
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="d-none d-md-table-cell">Time</th>
+                                <th>Customer</th>
+                                <th>Plate</th>
+                                <th class="d-none d-md-table-cell">Service</th>
+                                <th>Amount</th>
+                                <th class="d-none d-lg-table-cell">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in recent_visits %}
+                            <tr>
+                                <td class="d-none d-md-table-cell text-muted small">{{ visit['visit_time'][:5] }}</td>
+                                <td class="fw-bold">{{ visit['customer_name'] }}</td>
+                                <td><span class="badge bg-secondary">{{ visit['plate_number'] }}</span></td>
+                                <td class="d-none d-md-table-cell small">{{ visit['service_name'] }}</td>
+                                <td>
+                                    {% if visit['is_loyalty_reward'] %}
+                                    <span class="text-success fw-bold">FREE</span>
+                                    {% else %}
+                                    <span class="fw-bold">KES {{ '{:,.0f}'.format(visit['amount_paid']) }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-lg-table-cell"><span class="badge bg-dark">Completed</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    No visits recorded today.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [SECTION] TOP CUSTOMERS (LEADERBOARD) -->
+    <!-- List of customers sorted by total spending -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="m-0 fw-bold">
+                    <i class="fas fa-star text-muted me-2"></i> Top Customers
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for customer in top_customers %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <strong>{{ customer['name'] }}</strong>
+                                <br>
+                                <small class="text-muted">{{ customer['total_visits'] }} visits</small>
+                            </div>
+                        </div>
+                        <span class="fw-bold">
+                            KES {{ '{:,.0f}'.format(customer['total_spent']) }}
+                        </span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-center text-muted py-5">
+                        No customers registered yet.
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card-footer bg-white border-0 p-3">
+                <a href="{{ url_for('customers') }}" class="text-decoration-none text-dark fw-bold">
+                    View All Customers <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
