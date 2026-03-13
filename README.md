@@ -11,7 +11,7 @@
 ## Project Overview
 SafiWash CRM is a high-performance, responsive management portal specifically built for the modern car wash entrepreneur. It transforms messy manual logging into a streamlined, data-driven operation. 
 
-The system solves the critical "Regular Customer" problem—allowing managers to identify their most loyal clients, reward them automatically, and track every shilling of revenue in real-time.
+The system solves the critical "Regular Customer" problem - allowing managers to identify their most loyal clients, reward them automatically, and track every shilling of revenue in real-time.
 
 ---
 
