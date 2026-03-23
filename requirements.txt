@@ -2,4 +2,7 @@
 # Install using: pip install -r requirements.txt
 
 Flask==3.0.0
+<<<<<<< HEAD
 python-dotenv>=1.0.0
+=======
+>>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b

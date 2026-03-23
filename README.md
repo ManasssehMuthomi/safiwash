@@ -13,6 +13,8 @@ SafiWash CRM is a high-performance, responsive management portal specifically bu
 
 The system solves the critical "Regular Customer" problem—allowing managers to identify their most loyal clients, reward them automatically, and track every shilling of revenue in real-time.
 
+
+
 ---
 
 ## Key Features

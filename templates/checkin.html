@@ -17,12 +17,17 @@
             <div class="card-body p-4">
                 <!-- Loyalty threshold hidden input for JS -->
                 <input type="hidden" id="loyalty_threshold_val" value="{{ loyalty_threshold }}">
+
                 <!-- Loyalty service id (used when redeeming a free wash) -->
                 <input type="hidden" id="loyalty_service_id" value="{{ loyalty_service_id }}">
 
                 <form method="POST" action="{{ url_for('checkin') }}">
                     <!-- Hidden service selector used when loyalty reward is applied -->
                     <input type="hidden" name="loyalty_service_id" id="serviceIdHidden">
+
+
+                
+
                     <!-- [STEP 1] SELECT CUSTOMER -->
                     <!-- Provides a dropdown of existing customers with loyalty status -->
                     <div class="mb-4">
@@ -52,7 +57,10 @@
                             <i class="fas fa-gift mt-1 me-3"></i>
                             <div>
                                 <div class="fw-bold">Free Wash Available!</div>
+
                                 <div class="small mb-2">This customer has earned enough points for a free service (no need to pick a service).</div>
+=======
+                                <div class="small mb-2">This customer has earned enough points for a free service.</div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="is_loyalty_reward" value="1"
                                         id="applyLoyalty">
@@ -186,6 +194,7 @@
         const loyaltyAlert = document.getElementById('loyaltyAlert');
         const applyLoyalty = document.getElementById('applyLoyalty');
         const thresholdInput = document.getElementById('loyalty_threshold_val');
+
         const loyaltyServiceIdInput = document.getElementById('loyalty_service_id');
         const serviceIdHidden = document.getElementById('serviceIdHidden');
         const threshold = thresholdInput ? parseInt(thresholdInput.value) : 10;
@@ -238,6 +247,30 @@
 
         // Handle service card visual selection
         serviceRadios.forEach(radio => {
+        const threshold = thresholdInput ? parseInt(thresholdInput.value) : 10;
+
+        if (customerSelect) {
+            customerSelect.addEventListener('change', function () {
+                const selected = this.options[this.selectedIndex];
+                if (!selected || !selected.value) {
+                    loyaltyAlert.classList.add('d-none');
+                    return;
+                }
+
+                const loyalty = parseInt(selected.dataset.loyalty) || 0;
+
+                if (loyalty >= threshold) {
+                    loyaltyAlert.classList.remove('d-none');
+                } else {
+                    loyaltyAlert.classList.add('d-none');
+                    if (applyLoyalty) applyLoyalty.checked = false;
+                }
+            });
+        }
+
+        // Handle service card visual selection
+        document.querySelectorAll('input[name="service_id"]').forEach(radio => {
+
             radio.addEventListener('change', function () {
                 document.querySelectorAll('.service-card').forEach(card => {
                     card.style.borderColor = '#e2e8f0';
@@ -251,8 +284,11 @@
             });
         });
 
+
         // Initialize state based on currently selected customer
         onCustomerChange();
+
+
     });
 </script>
 {% endblock %}
