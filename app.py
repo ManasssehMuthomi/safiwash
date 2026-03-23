@@ -1,14 +1,10 @@
 """
 SafiWash CRM - Car Wash Customer Relationship Management System
-================================================================
 Author: Muthomi Manasseh
-<<<<<<< HEAD
 Institution: 
 Date: April  2026
-=======
 Institution: ZETECH UNIVERSITY
 Date: MARCH 2026
->>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b
 
 System Overview:
 ----------------
@@ -31,19 +27,16 @@ Technical Stack:
 - UI Framework: Bootstrap 5 (Responsive design)
 """
 
-<<<<<<< HEAD
 import os
 import sqlite3
 from datetime import datetime,timedelta
 from functools import wraps
 from flask import Flask, render_template,request,redirect, url_for, flash, jsonify, session
-=======
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session # 
 import sqlite3 # 
 import os
 from datetime import datetime, timedelta
 from functools import wraps
->>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
@@ -175,7 +168,6 @@ def init_db():
                 'INSERT INTO services (name, description, price, duration_minutes) VALUES (?, ?, ?, ?)',
                 default_services
             )
-<<<<<<< HEAD
 
         # Ensure a loyalty reward service exists so we can record free visits without requiring a paid service selection.
         get_loyalty_service_id(conn)
@@ -205,11 +197,9 @@ def get_loyalty_service_id(conn):
     return cursor.lastrowid
 
 
-=======
     conn.close()
 
 
->>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b
 # =============================================================================
 # AUTHENTICATION DECORATOR
 # =============================================================================
@@ -555,7 +545,6 @@ def checkin():
     """
     conn = get_db_connection()
     services = conn.execute('SELECT * FROM services WHERE is_active = 1').fetchall()
-<<<<<<< HEAD
     loyalty_service_id = get_loyalty_service_id(conn)
     
     if request.method == 'POST':
@@ -597,7 +586,6 @@ def checkin():
         service = conn.execute('SELECT * FROM services WHERE id = ?', (service_id,)).fetchone()
         if not service:
             flash('Selected service does not exist.', 'danger')
-=======
     
     if request.method == 'POST':
         customer_id = request.form.get('customer_id')
@@ -616,7 +604,6 @@ def checkin():
         
         if not service or not customer:
             flash('Invalid customer or service.', 'danger')
->>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b
             conn.close()
             return redirect(url_for('checkin'))
         
@@ -660,7 +647,6 @@ def checkin():
     customers = conn.execute('SELECT * FROM customers ORDER BY name').fetchall()
     conn.close()
     
-<<<<<<< HEAD
     return render_template(
         'checkin.html',
         services=services,
@@ -668,9 +654,7 @@ def checkin():
         loyalty_threshold=LOYALTY_THRESHOLD,
         loyalty_service_id=loyalty_service_id
     )
-=======
     return render_template('checkin.html', services=services, customers=customers, loyalty_threshold=LOYALTY_THRESHOLD)
->>>>>>> b10a33e4be94327e947bc27432591f7e9de0889b
 
 
 # =============================================================================
