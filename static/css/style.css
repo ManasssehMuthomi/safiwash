@@ -1,0 +1,558 @@
+/*
+ * SafiWash CRM - Professional Minimalist Styles
+ */
+
+/* ============================================
+   ROOT VARIABLES
+   ============================================ */
+:root {
+    --primary: #2c5282;
+    --primary-light: #ebf4ff;
+    --success: #2f855a;
+    --success-light: #f0fff4;
+    --dark: #1a202c;
+    --gray: #718096;
+    --gray-light: #f7fafc;
+    --border: #e2e8f0;
+    --sidebar-bg: #1a202c;
+    --sidebar-hover: rgba(255, 255, 255, 0.05);
+    --header-height: 72px;
+}
+
+.extra-small {
+    font-size: 0.7rem;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+body {
+    background: #f8fafc;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #2d3748;
+}
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+.wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--sidebar-bg);
+    color: #fff;
+    transition: all 0.3s;
+    height: 100vh;
+    position: fixed;
+    /* Changed from sticky to fixed for absolute stability */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1001;
+    /* Higher than navbar to ensure full pillar look */
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar .sidebar-header {
+    height: var(--header-height);
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+
+#sidebar .components {
+    padding: 20px 0;
+    flex-grow: 1;
+}
+
+#sidebar .sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu-dark {
+    background-color: #2d3748;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .sidebar-footer .text-muted {
+    color: #a0aec0 !important;
+    /* Brighter gray for visibility */
+}
+
+#sidebar .sidebar-footer:hover {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+}
+
+.dropdown-item {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+}
+
+#sidebar ul li a {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    color: #a0aec0;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+#sidebar ul li a:hover {
+    color: #fff;
+    background: var(--sidebar-hover);
+}
+
+#sidebar ul li.active>a {
+    color: #fff;
+    background: #2d3748;
+}
+
+#sidebar ul li a i {
+    margin-right: 12px;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+#content {
+    flex-grow: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    padding-top: var(--header-height);
+    margin-left: 250px;
+    /* Added margin to respect the fixed sidebar */
+    transition: all 0.3s;
+}
+
+.row {
+    margin-right: -10px;
+    margin-left: -10px;
+}
+
+.col,
+[class*="col-"] {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+/* Collapsible Sidebar (Mini Mode) */
+#sidebar.collapsed {
+    min-width: 80px;
+    max-width: 80px;
+}
+
+#sidebar.collapsed .sidebar-footer {
+    display: none;
+}
+
+#sidebar.collapsed .sidebar-header h4,
+#sidebar.collapsed .sidebar-header .text-muted,
+#sidebar.collapsed ul li a span.link-text,
+#sidebar.collapsed .sidebar-footer .text-truncate,
+#sidebar.collapsed .sidebar-footer .dropdown {
+    display: none;
+}
+
+#sidebar.collapsed ul li a {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+#sidebar.collapsed ul li a i {
+    margin-right: 0;
+    font-size: 20px;
+}
+
+
+/* ============================================
+   TOP NAVBAR (STAY PERMANENT)
+   ============================================ */
+.navbar {
+    background: #fff !important;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 250px;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+#sidebar.collapsed+#content {
+    margin-left: 80px;
+}
+
+#sidebar.collapsed+#content .navbar {
+    left: 80px;
+}
+
+#sidebarCollapse {
+    border: 1px solid var(--border);
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--gray);
+}
+
+/* ============================================
+   MOBILE BOTTOM NAV
+   ============================================ */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    z-index: 1100;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--gray);
+    font-size: 10px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.mobile-bottom-nav a.active {
+    color: var(--primary);
+}
+
+.mobile-bottom-nav a i {
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+
+/* ============================================
+   STAT CARDS
+   ============================================ */
+.stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    height: 100%;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--gray);
+    background: var(--gray-light);
+    margin: 0 auto 12px auto;
+}
+
+.stat-card .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gray);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.stat-card .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+/* ============================================
+   GENERAL CARDS
+   ============================================ */
+.card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table thead th {
+    background: var(--gray-light);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gray);
+    font-weight: 600;
+    padding: 12px 16px;
+}
+
+.table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #2b6cb0;
+}
+
+.btn-dark {
+    background: var(--dark);
+    border: none;
+}
+
+.btn-dark:hover {
+    background: #000;
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+    padding: 6px 10px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.badge.bg-secondary {
+    background: var(--gray-light) !important;
+    color: var(--gray) !important;
+    border: 1px solid var(--border);
+}
+
+.badge.bg-dark {
+    background: var(--dark) !important;
+}
+
+/* ============================================
+   AVATARS
+   ============================================ */
+.avatar-circle {
+    display: none !important;
+}
+
+/* ============================================
+   PROGRESS BARS
+   ============================================ */
+.progress {
+    height: 8px;
+    background: var(--gray-light);
+    border-radius: 4px;
+}
+
+.progress-bar {
+    background: var(--success);
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+.form-control,
+.form-select {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+}
+
+/* Payment Selector Cards */
+.payment-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border) !important;
+    background: #fff !important;
+    color: var(--gray) !important;
+}
+
+.payment-card:hover {
+    border-color: var(--primary) !important;
+    background: var(--primary-light) !important;
+}
+
+.btn-check:checked+.payment-card {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(44, 82, 130, 0.2);
+}
+
+.btn-check:checked+.payment-card i {
+    opacity: 1 !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    #sidebar {
+        display: none;
+    }
+
+    #content {
+        width: 100%;
+        margin-left: 0 !important;
+        padding-bottom: 80px;
+    }
+
+    .container-fluid.p-4 {
+        padding: 1rem 0.75rem !important;
+    }
+
+    .mobile-bottom-nav {
+        display: flex;
+        z-index: 2000 !important;
+        /* Extremely high to beat tables/modals */
+    }
+
+    .navbar {
+        padding: 12px 15px;
+        left: 0 !important;
+    }
+
+    .stat-card {
+        padding: 15px 10px;
+    }
+
+    .stat-card .stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .stat-label {
+        font-size: 10px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 16px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+
+    /* [MOBILE FIX] VIEWPORT FREEDOM */
+    /* Removes restrictive card borders/padding so table fills screen without scrolling */
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .card-body {
+        padding: 0 !important;
+    }
+
+    /* [MOBILE FIX] ACTION MENUS */
+    /* Prevents dropdowns from being cut off by high table container */
+    .table-responsive {
+        border: none !important;
+        overflow: visible !important;
+    }
+
+    .table tbody td {
+        padding: 12px 10px !important;
+        font-size: 13px !important;
+        position: relative;
+    }
+
+    .dropdown-menu {
+        z-index: 1060 !important;
+    }
+
+    .table thead th {
+        padding: 10px 10px !important;
+        font-size: 10px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .extra-small {
+        font-size: 11px;
+    }
+}
