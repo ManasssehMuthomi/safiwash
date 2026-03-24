@@ -1,10 +1,9 @@
 """
 SafiWash CRM - Car Wash Customer Relationship Management System
+================================================================
 Author: Muthomi Manasseh
 Institution: 
 Date: April  2026
-Institution: ZETECH UNIVERSITY
-Date: MARCH 2026
 
 System Overview:
 ----------------
@@ -32,11 +31,6 @@ import sqlite3
 from datetime import datetime,timedelta
 from functools import wraps
 from flask import Flask, render_template,request,redirect, url_for, flash, jsonify, session
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session # 
-import sqlite3 # 
-import os
-from datetime import datetime, timedelta
-from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
@@ -65,7 +59,7 @@ def get_db_connection():
     Row factory allows accessing columns by name (e.g., row['name']).
     """
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row 
     return conn
 
 
@@ -172,7 +166,7 @@ def init_db():
         # Ensure a loyalty reward service exists so we can record free visits without requiring a paid service selection.
         get_loyalty_service_id(conn)
 
-    conn.close()
+    conn.close() # 
 
 
 def get_loyalty_service_id(conn):
@@ -195,9 +189,6 @@ def get_loyalty_service_id(conn):
         ('Loyalty Reward', 'Free wash redeemed via loyalty program', 0.0, 30, 0)
     )
     return cursor.lastrowid
-
-
-    conn.close()
 
 
 # =============================================================================
@@ -575,6 +566,9 @@ def checkin():
 
             # Prefer the server-side known loyalty ID if form value is missing
             service_id = loyalty_service_id_form or loyalty_service_id
+            amount = 0.0
+            payment_method = 'loyalty_reward'
+            
         else:
             service_id = request.form.get('service_id')
             if not service_id:
@@ -586,24 +580,6 @@ def checkin():
         service = conn.execute('SELECT * FROM services WHERE id = ?', (service_id,)).fetchone()
         if not service:
             flash('Selected service does not exist.', 'danger')
-    
-    if request.method == 'POST':
-        customer_id = request.form.get('customer_id')
-        service_id = request.form.get('service_id')
-        payment_method = request.form.get('payment_method', 'Cash')
-        is_loyalty_reward = request.form.get('is_loyalty_reward', '0') == '1'
-        
-        if not customer_id or not service_id:
-            flash('Please select a customer and service.', 'warning')
-            conn.close()
-            return redirect(url_for('checkin'))
-        
-        # Get service price
-        service = conn.execute('SELECT * FROM services WHERE id = ?', (service_id,)).fetchone()
-        customer = conn.execute('SELECT * FROM customers WHERE id = ?', (customer_id,)).fetchone()
-        
-        if not service or not customer:
-            flash('Invalid customer or service.', 'danger')
             conn.close()
             return redirect(url_for('checkin'))
         
@@ -654,7 +630,6 @@ def checkin():
         loyalty_threshold=LOYALTY_THRESHOLD,
         loyalty_service_id=loyalty_service_id
     )
-    return render_template('checkin.html', services=services, customers=customers, loyalty_threshold=LOYALTY_THRESHOLD)
 
 
 # =============================================================================
