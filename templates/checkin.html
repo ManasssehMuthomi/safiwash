@@ -186,77 +186,73 @@
 <!-- Manages loyalty rewards, service card selection, and UI feedback -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const customerSelect = document.getElementById('customerSelect');
-        const loyaltyAlert = document.getElementById('loyaltyAlert');
-        const applyLoyalty = document.getElementById('applyLoyalty');
-        const thresholdInput = document.getElementById('loyalty_threshold_val');
+    const customerSelect = document.getElementById('customerSelect');
+    const loyaltyAlert = document.getElementById('loyaltyAlert');
+    const applyLoyalty = document.getElementById('applyLoyalty');
+    const thresholdInput = document.getElementById('loyalty_threshold_val');
+    const loyaltyServiceIdInput = document.getElementById('loyalty_service_id');
+    const serviceIdHidden = document.getElementById('serviceIdHidden');
+    const serviceRadios = Array.from(document.querySelectorAll('input[name="service_id"]'));
 
-        const loyaltyServiceIdInput = document.getElementById('loyalty_service_id');
-        const serviceIdHidden = document.getElementById('serviceIdHidden');
-        const threshold = thresholdInput ? parseInt(thresholdInput.value) : 10;
-        const loyaltyServiceId = loyaltyServiceIdInput ? loyaltyServiceIdInput.value : '';
+    const threshold = thresholdInput ? parseInt(thresholdInput.value) : 10;
+    const loyaltyServiceId = loyaltyServiceIdInput ? loyaltyServiceIdInput.value : '';
 
-        const serviceRadios = Array.from(document.querySelectorAll('input[name="service_id"][type="radio"]'));
+    const updateServiceSelection = () => {
+        const loyaltyActive = applyLoyalty && applyLoyalty.checked && !loyaltyAlert.classList.contains('d-none');
 
-        const updateServiceSelection = () => {
-            const loyaltyActive = applyLoyalty && applyLoyalty.checked && !loyaltyAlert.classList.contains('d-none');
-
-            if (serviceIdHidden) {
-                serviceIdHidden.value = loyaltyActive ? loyaltyServiceId : '';
-            }
-
-            serviceRadios.forEach(radio => {
-                radio.disabled = loyaltyActive;
-                radio.required = !loyaltyActive;
-                if (loyaltyActive) radio.checked = false;
-            });
-        };
-
-        const onCustomerChange = () => {
-            const selected = customerSelect.options[customerSelect.selectedIndex];
-            if (!selected || !selected.value) {
-                loyaltyAlert.classList.add('d-none');
-                if (applyLoyalty) applyLoyalty.checked = false;
-                updateServiceSelection();
-                return;
-            }
-
-            const loyalty = parseInt(selected.dataset.loyalty) || 0;
-            if (loyalty >= threshold) {
-                loyaltyAlert.classList.remove('d-none');
-                if (applyLoyalty) applyLoyalty.checked = true;
-            } else {
-                loyaltyAlert.classList.add('d-none');
-                if (applyLoyalty) applyLoyalty.checked = false;
-            }
-            updateServiceSelection();
-        };
-
-        if (customerSelect) {
-            customerSelect.addEventListener('change', onCustomerChange);
+        if (serviceIdHidden) {
+            serviceIdHidden.value = loyaltyActive ? loyaltyServiceId : '';
         }
 
-        if (applyLoyalty) {
-            applyLoyalty.addEventListener('change', updateServiceSelection);
-        }
-
-        // Handle service card visual selection
         serviceRadios.forEach(radio => {
-            radio.addEventListener('change', function () {
-                document.querySelectorAll('.service-card').forEach(card => {
-                    card.style.borderColor = '#e2e8f0';
-                    card.style.backgroundColor = '#fff';
-                });
-                if (this.checked) {
-                    const card = this.closest('.service-card');
-                    card.style.borderColor = '#2c5282';
-                    card.style.backgroundColor = '#ebf4ff';
-                }
-            });
+            radio.disabled = loyaltyActive;
+            radio.required = !loyaltyActive;
+            if (loyaltyActive) radio.checked = false;
         });
+    };
 
-        // Initialize state based on currently selected customer
-        onCustomerChange();
+    const onCustomerChange = () => {
+        const selected = customerSelect.options[customerSelect.selectedIndex];
+        if (!selected || !selected.value) {
+            loyaltyAlert.classList.add('d-none');
+            updateServiceSelection();
+            return;
+        }
+
+        const loyalty = parseInt(selected.dataset.loyalty) || 0;
+
+        // SHOW alert if eligible
+        if (loyalty >= threshold) {
+            loyaltyAlert.classList.remove('d-none');
+            // ❌ DO NOT auto-uncheck the checkbox
+        } else {
+            loyaltyAlert.classList.add('d-none');
+            if (applyLoyalty) applyLoyalty.checked = false;
+        }
+
+        updateServiceSelection();
+    };
+
+    if (customerSelect) customerSelect.addEventListener('change', onCustomerChange);
+    if (applyLoyalty) applyLoyalty.addEventListener('change', updateServiceSelection);
+
+    // Service card visual selection
+    serviceRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.style.borderColor = '#e2e8f0';
+                card.style.backgroundColor = '#fff';
+            });
+            if (this.checked) {
+                const card = this.closest('.service-card');
+                card.style.borderColor = '#2c5282';
+                card.style.backgroundColor = '#ebf4ff';
+            }
+        });
     });
+
+    // INITIALIZE
+    onCustomerChange();
+});
 </script>
 {% endblock %}
