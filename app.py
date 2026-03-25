@@ -583,10 +583,24 @@ def checkin():
             conn.close()
             return redirect(url_for('checkin'))
         
-        # Calculate amount (0 if loyalty reward)
-        amount = 0.0 if is_loyalty_reward else service['price']
+        # Get current date and time
         today = datetime.now().strftime('%Y-%m-%d')
         now = datetime.now().strftime('%H:%M:%S')
+
+        # Determine final amount and update points
+        if is_loyalty_reward:
+            # REDEEMING: Subtract threshold and set price to 0
+            amount = 0.0
+            new_points = max(0, customer['loyalty_points'] - LOYALTY_THRESHOLD)
+            payment_method = 'Loyalty Points'
+            success_msg = f'Loyalty Reward Redeemed! Free wash for {customer["name"]} (Points: {customer["loyalty_points"]} → {new_points})'
+            msg_cat = 'info'
+        else:
+            # EARNING: Price from service and increment points
+            amount = service['price']
+            new_points = customer['loyalty_points'] + 1
+            success_msg = f'Check-in complete for {customer["name"]}. KES {amount:.0f} collected. (Points: {customer["loyalty_points"]} → {new_points})'
+            msg_cat = 'success'
         
         # Insert visit record
         conn.execute('''
@@ -594,13 +608,7 @@ def checkin():
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (customer_id, service_id, amount, payment_method, 1 if is_loyalty_reward else 0, today, now))
         
-        # Update customer stats
-        new_points = 0 if is_loyalty_reward else customer['loyalty_points'] + 1
-        if is_loyalty_reward:
-            new_points = customer['loyalty_points'] - LOYALTY_THRESHOLD
-            if new_points < 0:
-                new_points = 0
-        
+        # Update customer record
         conn.execute('''
             UPDATE customers 
             SET total_visits = total_visits + 1,
@@ -611,11 +619,7 @@ def checkin():
         ''', (amount, new_points, today, customer_id))
         
         conn.commit()
-        
-        if is_loyalty_reward:
-            flash(f'Loyalty reward redeemed for {customer["name"]}. Free wash applied.', 'info')
-        else:
-            flash(f'Check-in complete for {customer["name"]}. Amount: KES {amount:.2f}', 'success')
+        flash(success_msg, msg_cat)
         
         conn.close()
         return redirect(url_for('dashboard'))
